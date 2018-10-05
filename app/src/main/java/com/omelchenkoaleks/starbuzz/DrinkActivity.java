@@ -23,7 +23,7 @@ public class DrinkActivity extends Activity {
         name.setText(drink.getName());
 
         // заполняем описание напитка
-        TextView description = findViewById(R.id.dimensions);
+        TextView description = findViewById(R.id.description);
         description.setText(drink.getDescription());
 
         // заполняем изображение напитка

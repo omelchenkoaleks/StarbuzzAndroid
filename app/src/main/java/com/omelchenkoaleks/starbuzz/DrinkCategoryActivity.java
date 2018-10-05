@@ -22,7 +22,7 @@ public class DrinkCategoryActivity extends Activity {
                 Drink.drinks);
 
         // адаптер массива связываем со списковым представлением методом setAdapter()
-        ListView listDrinks = (ListView) findViewById(R.id.list_drinks);
+        ListView listDrinks = findViewById(R.id.list_drinks);
         listDrinks.setAdapter(listAdapter);
 
         // создаем слушателя
