@@ -31,6 +31,8 @@ public class Drink {
         return imageResourceId;
     }
 
+    // этот метод будет использован во внутренней реализации массива, когда адаптер будет брать
+    // каждый элемент массива, преобразовывать его в String этим методом
     @Override
     public String toString() {
         return this.name;
