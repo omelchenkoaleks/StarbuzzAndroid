@@ -30,7 +30,7 @@ public class TopLevelActivity extends Activity {
 
         // добавляем слушателя к списковому представлению - это обеспечивает получение оповещений
         // о том, что пользователь щелкает на списковом предствалении
-        ListView listView = (ListView) findViewById(R.id.list_options);
+        ListView listView = findViewById(R.id.list_options);
         listView.setOnItemClickListener(itemClickListener);
     }
 }
