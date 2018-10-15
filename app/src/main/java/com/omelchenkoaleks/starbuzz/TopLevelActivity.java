@@ -13,23 +13,27 @@ public class TopLevelActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_top_level);
+        setupOptionsListView();
+    }
 
-        // нужно создать объект OnItemClickListener и реализовать метод onItemClick = тогда
-        // варинаты списка будут реагировать на щелчки
-        AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> listView, View itemView, int position, long id) {
-                // первый вариант в списковом предствлении
-                if (position == 0) {
-                    // запустить DrinkCategoryActivity, если пользователь щелкнул на варинате 0 (Drink)
-                    Intent intent = new Intent(TopLevelActivity.this, DrinkCategoryActivity.class);
-                    startActivity(intent);
-                }
-            }
-        };
-
-        // добавляем слушателя к списковому представлению - это обеспечивает получение оповещений
-        // о том, что пользователь щелкает на списковом предствалении
+    // код, который относится к списковому представлению выносим в отдельный метод
+    private void setupOptionsListView() {
+        // создание OnItemClickListener
+        AdapterView.OnItemClickListener itemClickListener =
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> listView,
+                                            View itemView,
+                                            int position,
+                                            long id) {
+                        if (position == 0) {
+                            Intent intent = new Intent(TopLevelActivity.this,
+                                    DrinkCategoryActivity.class);
+                            startActivity(intent);
+                        }
+                    }
+                };
+        // добавляем слушатель к списковому представлению
         ListView listView = findViewById(R.id.list_options);
         listView.setOnItemClickListener(itemClickListener);
     }
