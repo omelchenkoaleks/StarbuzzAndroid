@@ -92,6 +92,29 @@ public class TopLevelActivity extends Activity {
         });
     }
 
+    /**
+     * добавляем метод, который вызывается при возврате пользователя к TopLevelActivity
+     * так метод changeCursor() будет заменять текущий курсор, связанный с курсором адаптера, новым
+     */
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Cursor newCursor = mSQLiteDatabase.query("DRINK",
+                new String[] {"_id", "NAME"},
+                "FAVORITE = 1",
+                null, null, null, null);
+
+        ListView listFavorites = findViewById(R.id.list_favorites);
+
+        // курсор, используемый list_favorites, заменяется новым курсором
+        CursorAdapter adapter = (CursorAdapter) listFavorites.getAdapter();
+        adapter.changeCursor(newCursor);
+        // значение favoritesCursor заменяется новым курсором, чтобы его можно было закрыть в методе
+        // onDestroy() активности
+        favoritesCursor = newCursor;
+    }
+
+
     // закрываем курсор и базу данных в этом методе, потому что он вызывается перед уничтожением
     // активности и они уже не понадобятся
     @Override
