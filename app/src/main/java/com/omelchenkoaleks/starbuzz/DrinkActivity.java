@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
@@ -89,32 +90,99 @@ public class DrinkActivity extends Activity {
 //        photo.setContentDescription(drink.getName());
     }
 
-    // обновление базы данных по щелчку на флажке
+    // обновляем базу данных по щелчку на флажке
     public void onFavoriteClicked(View view) {
+
         int drinkId = (Integer) getIntent().getExtras().get(EXTRA_DRINKID);
 
-        // значение флажка добавляем в объект ContentValues с именем drinkValues
-        CheckBox favorite = findViewById(R.id.favorite);
-        ContentValues drinkValues = new ContentValues();
-        drinkValues.put("FAVORITE", favorite.isChecked());
+        // выполнить задачу - вызывается код AsyncTask и выполняет обновление в фоновом режиме
+        new UpdateDrinkTask().execute(drinkId);
+    }
 
-        // получение ссылки на базу данных и обновление столбца FAVORITE
-        SQLiteOpenHelper starbuzzDatabaseHelper = new StarbuzzDatabaseHelper(this);
-        try {
-            SQLiteDatabase sqLiteDatabase = starbuzzDatabaseHelper.getWritableDatabase();
-            // таблица, данные которой нужно обновить
-            sqLiteDatabase.update("DRINK",
-                    // новые значения
-                    // ContentValues с парами "имя/значение" обновляемых столбцов и значений
-                    drinkValues,
-                    // параметры conditionClause and conditionArguvents определяют записи, в
-                    // которые вносятся изменения
-                    "_id = ?",
-                    new String[] {Integer.toString(drinkId)});
-            sqLiteDatabase.close();
-        } catch (SQLiteException ex) {
-            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
-            toast.show();
+    // внутренний класс для обновления напитка
+    private class UpdateDrinkTask extends AsyncTask<Integer, Void, Boolean> {
+
+        /**
+         * определили как приватную, т.к. она используется
+         * только в методах onExecute() and doInBackground()
+          */
+        private ContentValues drinkValues;
+
+        /**
+         * перед выполнением кода базы данных значение флажка
+         * помещается в объект drinkValues типа ContentValues
+         */
+        @Override
+        protected void onPreExecute() {
+            CheckBox favorite = findViewById(R.id.favorite);
+            drinkValues = new ContentValues();
+            drinkValues.put("FAVORITE", favorite.isChecked());
+        }
+
+        // код базы данных выполняется в фоновом потоке
+        @Override
+        protected Boolean doInBackground(Integer... drinks) {
+            int drinkId = drinks[0];
+            SQLiteOpenHelper starbuzzDatabaseHelper =
+                    new StarbuzzDatabaseHelper(DrinkActivity.this);
+            try {
+                SQLiteDatabase sqLiteDatabase = starbuzzDatabaseHelper.getWritableDatabase();
+                sqLiteDatabase.update("DRINK", drinkValues,
+                        // обновление столбца FAVORITE
+                        "_id = ?", new String[] {Integer.toString(drinkId)});
+                sqLiteDatabase.close();
+                return true;
+            } catch (SQLiteException ex) {
+                return false;
+            }
+        }
+
+        /**
+         * если при выполнении кода базы данных произошла ошибка, вывести сообщение
+         * код в методе проверяет - успешно ли был выполнен код базы данных в фоновом режиме или
+         * был false
+         */
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (!success) {
+                Toast toast = Toast.makeText(DrinkActivity.this,
+                        "Database unavailable", Toast.LENGTH_SHORT);
+                toast.show();
+            }
         }
     }
+
+
+    /**
+     * старая версия кода изменена, чтобы вынести код базы данных в фоновый режим с помощью
+     * класса AsyncTask
+     */
+//    // обновление базы данных по щелчку на флажке
+//    public void onFavoriteClicked(View view) {
+//        int drinkId = (Integer) getIntent().getExtras().get(EXTRA_DRINKID);
+//
+//        // значение флажка добавляем в объект ContentValues с именем drinkValues
+//        CheckBox favorite = findViewById(R.id.favorite);
+//        ContentValues drinkValues = new ContentValues();
+//        drinkValues.put("FAVORITE", favorite.isChecked());
+//
+//        // получение ссылки на базу данных и обновление столбца FAVORITE
+//        SQLiteOpenHelper starbuzzDatabaseHelper = new StarbuzzDatabaseHelper(this);
+//        try {
+//            SQLiteDatabase sqLiteDatabase = starbuzzDatabaseHelper.getWritableDatabase();
+//            // таблица, данные которой нужно обновить
+//            sqLiteDatabase.update("DRINK",
+//                    // новые значения
+//                    // ContentValues с парами "имя/значение" обновляемых столбцов и значений
+//                    drinkValues,
+//                    // параметры conditionClause and conditionArguvents определяют записи, в
+//                    // которые вносятся изменения
+//                    "_id = ?",
+//                    new String[] {Integer.toString(drinkId)});
+//            sqLiteDatabase.close();
+//        } catch (SQLiteException ex) {
+//            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
+//            toast.show();
+//        }
+//    }
 }
