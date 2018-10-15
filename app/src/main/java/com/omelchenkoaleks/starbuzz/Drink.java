@@ -1,5 +1,9 @@
 package com.omelchenkoaleks.starbuzz;
 
+/**
+ *  Этот класс уже не нужен потому что есть база данных, но
+ *  для конспекта оставлен (можно сравнить два подхода)
+ */
 public class Drink {
     private String name;
     private String description;
